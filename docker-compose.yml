@@ -1,0 +1,48 @@
+version: '2.1'
+
+services:
+  postgres:
+    image: postgres:9.6-alpine
+    restart: always
+    ports:
+      - "5432"
+    healthcheck:
+      test: echo "SELECT 1+1;" | psql --user postgres -w > /dev/null
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:3.2-alpine
+    restart: always
+    ports:
+      - "6379"
+
+  nginx:
+    restart: always
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./docker/backend/
+      dockerfile: Dockerfile
+      args:
+        repo: https://github.com/rubyroidlabs/minsk-rb-demo.git
+    image: minsk-rb-backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  sidekiq:
+    image: minsk-rb-backend
+    restart: always
+    command: sh -c "bundle exec sidekiq"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
