@@ -47,5 +47,5 @@ environment ENV.fetch("RAILS_ENV") { "development" }
 plugin :tmp_restart
 
 if ENV.fetch("RAILS_ENV") != "development"
-  bind "unix://#{root}/tmp/sockets/puma.sock"
+  bind "unix://backend/tmp/sockets/puma.sock"
 end

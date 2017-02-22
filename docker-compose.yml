@@ -3,7 +3,6 @@ version: '2.1'
 services:
   postgres:
     image: postgres:9.6-alpine
-    restart: always
     ports:
       - "5432"
     healthcheck:
@@ -14,12 +13,10 @@ services:
 
   redis:
     image: redis:3.2-alpine
-    restart: always
     ports:
       - "6379"
 
   nginx:
-    restart: always
     depends_on:
       - backend
 
@@ -30,7 +27,6 @@ services:
       args:
         repo: https://github.com/rubyroidlabs/minsk-rb-demo.git
     image: minsk-rb-backend
-    restart: always
     depends_on:
       postgres:
         condition: service_healthy
@@ -39,7 +35,6 @@ services:
 
   sidekiq:
     image: minsk-rb-backend
-    restart: always
     command: sh -c "bundle exec sidekiq"
     depends_on:
       postgres:
